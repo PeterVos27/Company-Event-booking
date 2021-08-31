@@ -1,0 +1,84 @@
+package EventBookingProgramV2;
+
+import java.util.ArrayList;
+
+/*
+    This class contains events and it's details. Every event should be created through creating a host. Every host object
+    will have 1 event
+    All getters and setters have been added
+ */
+public class Event {
+    protected String eventName;
+    protected String eventDescr;
+    protected ArrayList<String> members;
+
+    public Event() {
+    }
+
+    protected String getName() {
+        return this.eventName;
+    }
+
+    protected String getDescription() {
+        return eventDescr;
+    }
+
+    protected void setName(String name) {
+        eventName = name;
+    }
+
+    protected void setDescription(String descr) {
+        eventDescr = descr;
+    }
+
+    // add member to members array of event
+    public void addMember(String member) {
+        System.out.println("Signing up " + member + " to " + eventName + "...");
+        members.add(member);
+        System.out.println(member + " was added to " + eventName);
+    }
+
+    // remove member to members array of event
+    public void delMember(String member) {
+        System.out.println("Removing " + member + " from " + eventName + "...");
+        members.add(member);
+        System.out.println(member + " was removed from " + eventName);
+
+    }
+
+    // checks if argument is in members array, returns true if true
+    public boolean isMember(String memberName) {
+        for (int i = 0; i < members.size(); i++) {
+            if (members.get(i).equalsIgnoreCase(memberName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    //print all members from this member array
+    protected void printMembers() {
+        int i;
+        System.out.println("People who signed up for " + getName() + ": ");
+        for (i = 0; i < members.size(); i++) {
+            System.out.println(members.get(i));
+        }
+
+        System.out.println("total of: " + i++ + " members");
+        System.out.println("                  ---                        ");
+    }
+
+    //Print details of this event
+    public void printEvent(DateTime dt) {
+        System.out.println("Event details:");
+        System.out.println("NAME: " + getName());
+        System.out.println("DESCRIPTION: " + getDescription());
+        System.out.println("ON:   " + dt.getYear() + dt.getMonth() + dt.getDay());
+        System.out.println("FROM: " + dt.getStartTime());
+        System.out.println("TO:   " + dt.getEndTime());
+        System.out.println();
+        printMembers();
+        System.out.println("     ---     ");
+    }
+
+}
