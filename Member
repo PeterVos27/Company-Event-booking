@@ -1,0 +1,142 @@
+package EventBookingProgramV2;
+
+import java.util.InputMismatchException;
+import java.util.Scanner;
+
+/*
+    start of the program. main method creates a new member. From there, the user has multiple options.
+
+                Warning: Data is not persistent. After closing program, no data will be saved
+ */
+public class Member {
+    Scanner keyboard;
+    String memberName;
+    String eventName;
+    Host host;
+
+    //start of program, Initialises Event array and creates Member object
+    public static void main(String[] args) {
+        Scanner keyboard = new Scanner(System.in);
+        Host.initHostArray();
+        Member member = new Member();
+    }
+
+
+    public Member() {
+        int loginInput = 0;
+        keyboard = new Scanner(System.in);
+        setMember();
+        System.out.println("\n\nWelcome! You can create your own event,");
+        System.out.println("see upcoming events,");
+        System.out.println("and sign up for an event.");
+        // continuous loop until program ends
+        do {
+            System.out.println();
+            System.out.println("Please select one of the following numbers to continue");
+            System.out.println("(1) Sign up for event");
+            System.out.println("(2) Sign off of event");
+            System.out.println("(3) Create new event");
+            System.out.println("(4) Continue as Event host");
+            System.out.println("(5) Get all upcoming events and details");
+            System.out.println("(8) Change user");
+            System.out.println("(9) Who am I?");
+            System.out.println("(0) Exit program");
+            try {
+                loginInput = keyboard.nextInt();
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid input. Try again");
+            }
+            keyboard.nextLine();
+            System.out.println("                ---                  ");
+            switch (loginInput) {
+                case 1:
+                    signUp();
+                    break;
+                case 2:
+                    signOff();
+                    break;
+                case 3:
+                    createEvent();
+                    break;
+                case 4:
+                    continueAsHost();
+                    break;
+                case 5:
+                    Host.printEvents();
+                    break;
+                case 8:
+                    setMember();
+                    break;
+                case 9:
+                    System.out.println(getMember());
+                    break;
+                case 0:
+                    System.out.println("Exiting program now...");
+                    loginInput = 0;
+                    break;
+                default:
+                    System.out.println("Invalid input. Try again");
+                    break;
+            }
+        } while (loginInput != 0);
+    }
+
+    // Check if input name equals existing event name, if true, add to member array
+    public void signUp() {
+        System.out.println("For which event do you want to sign up?");
+        System.out.println();
+        eventName = keyboard.nextLine();
+        host = Host.getEvent(eventName);
+        if (!host.isMember(getMember())) {
+            try {
+                System.out.println("current event: " + host.getName());
+                System.out.println("current member" + getMember());
+                host.addMember(getMember());
+            } catch (NullPointerException e) {
+                System.out.println("Event not found, returning...");
+            }
+        } else System.out.println("This member's name was already added to this event.");
+    }
+
+    // Check if input name equals existing event name, if true, delete from member array
+    public void signOff() {
+        System.out.println("From which event do you want to sign off?");
+        System.out.println();
+        eventName = keyboard.nextLine();
+        host = Host.getEvent(eventName);
+        if (host.isMember(getMember())) {
+            try {
+                host.delMember(getMember());
+            } catch (NullPointerException e) {
+                System.out.println("Event not found, returning...");
+            }
+        } else System.out.println("This member's name was not yet added to this event.");
+    }
+    //sets new input as UserName
+    public void setMember() {
+        System.out.println("Please enter a username and hit enter");
+        memberName = keyboard.nextLine();
+        System.out.println("Username set!");
+    }
+
+    public String getMember() {
+        return memberName;
+    }
+
+    //create new Host object
+    private void createEvent() {
+        host = new Host();
+    }
+
+
+    public void continueAsHost() {
+        System.out.println("continue as host of which event");
+        eventName = keyboard.nextLine();
+        host = Host.getEvent(eventName);
+        try {
+            host.hostActions();
+        } catch (NullPointerException e) {
+            System.out.println("Event not found, returning...");
+        }
+    }
+}
