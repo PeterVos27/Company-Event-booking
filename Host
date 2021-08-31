@@ -1,0 +1,289 @@
+package EventBookingProgramV2;
+
+import java.util.ArrayList;
+import java.util.Scanner;
+
+
+/*
+            Every event has a host and datetime object. To access this class and it's methods, you will need to validate the password.
+            From there you can change all attributes of an event.
+ */
+public class Host extends Event {
+
+    String password;
+    Scanner keyboard;
+    DateTime dt;
+    private static ArrayList<Host> events;
+
+    //create new host, event and datetime object
+    public Host() {
+        super();
+        keyboard = new Scanner(System.in);
+        dt = new DateTime();
+        int confirm = 0;
+        setEventName();
+        setDescription();
+        if (setStartDate()) {
+            ;
+            if (setStartTime()) {
+                ;
+                if (setEndTime()) {
+                    ;
+                    System.out.println("Type 1 to confirm, 0 to cancel and return");
+                    confirm = keyboard.nextInt();
+                    keyboard.nextLine();
+                }
+            }
+        }
+        if (confirm == 1) {
+            setPassword();
+            addToHostArray();
+            members = new ArrayList<>();
+            System.out.println("Event successfully created and you have been added as the host");
+        }
+    }
+
+    //allows a validated user to change event details
+    public void hostActions() {
+        int hostAction;
+        System.out.println("Enter your password to continue");
+        if (validatePassword(keyboard.nextLine(), getPassword())) {
+            System.out.println("You are now signed in as a host and can make changes to your event");
+            do {
+                System.out.println("Please select one of the following numbers to continue");
+                System.out.println("(1) Change event name");
+                System.out.println("(2) Change event description");
+                System.out.println("(3) Change event start date");
+                System.out.println("(4) Change event start time");
+                System.out.println("(5) Change event end time");
+                System.out.println("(6) Get event details");
+                System.out.println("(7) See who signed up");
+                System.out.println("(9) Change password");
+                System.out.println("(0) Return to main menu");
+                hostAction = keyboard.nextInt();
+                keyboard.nextLine();
+                switch (hostAction) {
+                    case 1:
+                        this.setEventName();
+                        break;
+                    case 2:
+                        this.setDescription();
+                        break;
+                    case 3:
+                        this.setStartDate();
+                        break;
+                    case 4:
+                        this.setStartTime();
+                        break;
+                    case 5:
+                        this.setEndTime();
+                        break;
+                    case 6:
+                        this.printEvent(dt);
+                        break;
+                    case 7:
+                        this.printMembers();
+                        break;
+                    case 9:
+                        //after password validation, host can create new password
+                        System.out.println("Enter current password");
+                        String passAttempt = keyboard.nextLine();
+                        if (validatePassword(getPassword(), passAttempt)) {
+                            setPassword();
+                        } else {
+                            System.out.println("Password incorrect...");
+                        }
+                    case 0:
+                        break;
+                }
+            } while (hostAction != 0);
+        } else {
+            System.out.println("Password incorrect. Returning...");
+        }
+    }
+
+    //initialize event array when app starts
+    protected static void initHostArray() {
+        events = new ArrayList<>();
+    }
+
+    // add event to events array
+    protected void addToHostArray() {
+        events.add(this);
+    }
+
+    // delete event from events array
+    protected void delFromHostArray() {
+        events.remove(this);
+    }
+
+    // returns event object if exists
+    public static Host getEvent(String eventName) {
+        for (int i = 0; i < events.size(); i++) {
+
+            if (events.get(i).getName().equals(eventName)) {
+
+                return events.get(i);
+            }
+        }
+        return null;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    private void setEventName() {
+        String newName;
+        if (super.getName() != null && !super.eventName.isEmpty()) {
+            System.out.println("Current name: " + super.getName());
+        }
+        System.out.println("Please enter new name");
+        newName = keyboard.nextLine();
+        super.setName(newName);
+        System.out.println("New name: " + super.getName());
+    }
+
+    private void setDescription() {
+        String newDescr;
+        if (super.getDescription() != null && !super.getDescription().isEmpty()) {
+            System.out.println("Current description: " + super.getDescription());
+        }
+        System.out.println("Please enter new description");
+        newDescr = keyboard.nextLine();
+        super.setDescription(newDescr);
+        System.out.println("New description: " + super.getDescription());
+    }
+
+    // user input for setting a starting date. all dates and times get send to DateTime class
+    private boolean setStartDate() {
+        String newDate;
+        boolean cont = true;
+        do {
+            System.out.println("Please enter new date in YYYYMMDD format. Do not use spaces or symbols.");
+            newDate = keyboard.nextLine();
+            System.out.println(newDate);
+            if (newDate.equals("0")) {
+                cont = false;
+            } else if (newDate.length() == 8) {
+                boolean goodYear = dt.setYear(Integer.parseInt(newDate.substring(0, 4)));
+                boolean goodMonth = dt.setMonth(Integer.parseInt(newDate.substring(4, 6)));
+                boolean goodDay = dt.setDay(Integer.parseInt(newDate.substring(6, 8)));
+                System.out.println("New date: " + dt.getDate());
+                if (goodYear && goodMonth && goodDay) {
+                    cont = false;
+                    return true;
+                }
+            } else System.out.println("Invalid date! Try again or enter 0 to cancel.");
+        } while (cont == true);
+        return false;
+    }
+
+    // user input for setting a starting time. all dates and times get send to DateTime class
+    private boolean setStartTime() {
+        String newSTime;
+        boolean cont = true;
+        do {
+            System.out.println("Please enter new time in HHMM format. Do not use spaces or symbols.");
+            newSTime = keyboard.nextLine();
+            System.out.println(newSTime);
+            if (newSTime.equals("0")) {
+                cont = false;
+            } else if (newSTime.length() == 4) {
+                boolean goodHour = dt.setStartHour(Integer.parseInt(newSTime.substring(0, 2)));
+                boolean goodMinute = dt.setStartMinute(Integer.parseInt(newSTime.substring(2, 4)));
+                System.out.println("new starting time: " + dt.getStartTime());
+                if (goodHour && goodMinute) {
+                    cont = false;
+                    return true;
+                }
+            } else System.out.println("Invalid starting time. Try again or enter 0 to cancel.");
+        } while (cont == true);
+        return false;
+    }
+
+    // user input for setting a ending time. all dates and times get send to DateTime class
+    private boolean setEndTime() {
+        String newETime;
+        boolean cont = true;
+        do {
+            System.out.println("Please enter new time in HHMM format. Do not use spaces or symbols.");
+            newETime = keyboard.nextLine();
+            System.out.println(newETime);
+            if (newETime.equals("0")) {
+                cont = false;
+            } else if (newETime.length() == 4) {
+                boolean goodHour = dt.setEndHour(Integer.parseInt(newETime.substring(0, 2)));
+                boolean goodMinute = dt.setEndMinute(Integer.parseInt(newETime.substring(2, 4)));
+                System.out.println("new ending time: " + dt.getEndTime());
+                if (goodHour && goodMinute) {
+                    cont = false;
+                    return true;
+                }
+            } else System.out.println("Invalid ending time. Try again or enter 0 to cancel.");
+        } while (cont == true);
+        return false;
+    }
+
+    //sets new password or creates one if not exist
+    private void setPassword() {
+        boolean passValid = false;
+        String firstPass = null;
+        String secondPass = null;
+        keyboard = new Scanner(System.in);
+        do {
+            System.out.println("Please enter a new password. minimum 5 chars. enter 0 at any time to cancel and return");
+            firstPass = keyboard.nextLine();
+            if (firstPass.equals("0"))
+                return;
+            else {
+                if (firstPass.length() >= 5) {
+                    passValid = true;
+                    System.out.println("Re-enter your password");
+                    secondPass = keyboard.nextLine();
+                    if (secondPass.equals("0")) {
+                        return;
+                    }
+                    passValid = validatePassword(firstPass, secondPass);
+                } else {
+                    System.out.println("Password length incorrect. Try again");
+                    passValid = false;
+                }
+            }
+        } while (passValid == false);
+        password = firstPass;
+        System.out.println("Password set!");
+    }
+
+    //checks two strings for equality
+    public boolean validatePassword(String firstPass, String secondPass) {
+        if (firstPass.equals(secondPass)) {
+            System.out.println("Passwords match");
+            return true;
+        } else {
+            System.out.println("Passwords do not match");
+            return false;
+        }
+    }
+
+    // If any, print all events in arraylist. returns false if empty
+    public static boolean printEvents() {
+        if (events.size() == 0) {
+            System.out.println("No events found. Create one first.");
+            return false;
+        } else {
+            for (int i = 0; i < events.size(); i++) {
+                int eventNo = i + 1;
+                System.out.println("Event " + eventNo + ":");
+                System.out.println("NAME: " + events.get(i).getName());
+                System.out.println("DESCRIPTION: " + events.get(i).getDescription());
+                System.out.println("ON:   " + events.get(i).dt.getDate());
+                System.out.println("FROM: " + events.get(i).dt.getStartTime());
+                System.out.println("TO:   " + events.get(i).dt.getEndTime());
+                System.out.println("     ---     ");
+            }
+        }
+        System.out.println("           ---            ");
+        return true;
+    }
+}
